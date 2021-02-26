@@ -434,7 +434,7 @@ exports.users_update_profileImage = async (req,res,next)=>{
                 {
                     $set:{"profileImage": req.file.path}
                 },{new:true})
-                updateRecord.profileImage = 'http://localhost:3000/nodereact/'+ updateRecord.profileImage
+                updateRecord.profileImage = process.env.SERVER_URL + updateRecord.profileImage
             return res.status(200).json({message:"success", profile:updateRecord});
         });
     } catch (error) {
@@ -458,7 +458,8 @@ exports.users_update_coverImage = async (req,res,next)=>{
                 });
             }
             //update - add more to images
-            const updateRecord = await Users.findOneAndUpdate({_id:req.userData.userId},{$set:{"coverImage": req.file.path}},{new:true})
+            const updateRecord = await UserInformation.findOneAndUpdate({_id:req.userInfo._id},{$set:{"coverImage": req.file.path}},{new:true})
+            updateRecord.coverImage = process.env.SERVER_URL + updateRecord.coverImage
             return res.status(200).json({message:"success", profile:updateRecord});
         });
     } catch (error) {

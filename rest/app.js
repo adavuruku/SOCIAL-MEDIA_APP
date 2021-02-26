@@ -19,9 +19,13 @@ const con = require('./dbConnection');
 const usersRoutes = require('./app/routes/userRoute');
 const statisticRoutes = require('./app/routes/statisticRoute');
 
+app.use('/fileServer', express.static('./fileServer'));
 app.use('/api/user',usersRoutes);
 // app.use('/api/stat',statisticRoutes);
-
+// app.get("/:imagepath", (req, res) => {
+//     console.log(req.params.)
+//     res.sendFile(path.join(__dirname, "./uploads/image.png"));
+//   });
 app.use((error, req,res,next)=>{
     res.status(error.status || 500);
     res.json({
