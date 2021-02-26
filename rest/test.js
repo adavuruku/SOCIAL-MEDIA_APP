@@ -55,7 +55,11 @@ mongoose.connect(dbConfig.url, {
 // let r = [...new Set([...k.one,...g])]
 // console.log(r)
 
-let h = j = m  = "kk"
+// let h = j = m  = "kk"
 
-h = "well"
-console.log(h)
+// h = "well"
+// console.log(h)
+
+h = [2,4,5,6,7]
+g = h.map(j=>{j==2})
+console.log(g)

@@ -2,8 +2,10 @@ require('dotenv').config();
 const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
 const { Validator } = require('node-input-validator')
-// const random = require('random')
+var multer = require('multer');
 const bcrypt = require('bcrypt')
+
+//usable models
 const UserInformation = require('../models/users');
 const ProfileInformation = require('../models/profile');
 
@@ -132,14 +134,14 @@ exports.my_profile = async (req,res,next)=>{
 exports.update_profile = async (req,res,next)=>{
     try {
         const v = new Validator(req.body, {
-            status: "required|string",
-            social: "required|object",
-            skills: "required|array",
-            location: "required|string|minLength:1",
+            status: "string",
+            social: "object",
+            skills: "array",
+            location: "string|minLength:1",
             website: "url",
-            company: "required|string|minLength:1",
-            bio: "required|string|minLength:1",
-            githubUserName: "required|string|minLength:1"
+            company: "string|minLength:1",
+            bio: "string|minLength:1",
+            githubUserName: "string|minLength:1"
         })
 
         const matched = await v.check()
@@ -160,9 +162,10 @@ exports.update_profile = async (req,res,next)=>{
                 company = !req.body.company ? profileInfo.company :req.body.company;
                 bio = !req.body.bio ? profileInfo.bio :req.body.bio;
                 githubUserName = !req.body.githubUserName ? profileInfo.githubUserName : req.body.githubUserName;
-                let profileInfo = await ProfileInformation.findOneAndUpdate({user:profileInfo._id},
+
+                updatedProfile = await ProfileInformation.findOneAndUpdate({user:profileInfo.user},
                     {
-                        $addToSet:{
+                        $set:{
                             status:status,
                             location:location,
                             company:company,
@@ -175,22 +178,29 @@ exports.update_profile = async (req,res,next)=>{
                     },{new:true})
                     return res.status(200).json({
                         message:'Success',
-                        profileInfo
+                        profile:updatedProfile
                     });
             }else{
                 //create
-               
+                status = !req.body.status ? status :req.body.status;
+                social = !req.body.social ? social :req.body.social;
+                skills = !req.body.skills ? skills :req.body.skills;
+                location = !req.body.location ? location :req.body.location;
+                website = !req.body.website ? website :req.body.website;
+                company = !req.body.company ? company :req.body.company;
+                bio = !req.body.bio ? bio :req.body.bio;
+
                 const profile = new ProfileInformation({
                     _id : mongoose.Types.ObjectId(),
                     user:req.userInfo._id,
-                    status:req.body.status.trim(),
-                    location:req.body.location.trim(),
-                    company:req.body.company.trim(),
-                    bio:req.body.bio.trim(),
-                    githubUserName:req.body.githubUserName.trim(),
-                    social:req.body.social,
-                    skills:req.body.skills,
-                    website:req.body.website.trim()
+                    status:status,
+                    location:location,
+                    company:company,
+                    bio:bio,
+                    githubUserName:githubUserName,
+                    social:social,
+                    skills:skills,
+                    website:website
                 });
                 let profileInfo = await profile.save()
                 return res.status(200).json({
@@ -207,15 +217,7 @@ exports.update_profile = async (req,res,next)=>{
     }
 }
 
-const education = mongoose.Schema({
-    school: {type: String, default:null},
-    degree:{type:String, default:null},
-    fieldOfStudy:{type: String, default:null},
-    description:{type: String, default:null},
-    from:{type:Date, default:null},
-    to:{type:Date, default:null},
-    current:{type:Boolean, default:false},
-});
+
 exports.update_profile_education = async (req,res,next)=>{
     try {
         const v = new Validator(req.body, {
@@ -274,7 +276,37 @@ exports.update_profile_education = async (req,res,next)=>{
         });
     }
 }
+exports.delete_profile_education = async (req,res,next)=>{
+    try {
+        const v = new Validator(req.body, {
+            educationId: "required|string"
+        })
 
+        const matched = await v.check()
+        if(matched){
+            let profileInfo = await ProfileInformation.findOne({user: req.userInfo._id});
+            if(profileInfo){
+                let removeIndex = profileInfo.education.map(element=>{element._id}).indexOf(req.body.educationId)
+                profileInfo.education.splice(removeIndex,1)
+                await profileInfo.save()
+            }
+            return res.status(200).json({
+                message:'Success',
+                profileInfo
+            });
+        }
+
+        return res.status(500).json({
+            message:'Invalid Input'
+        });
+    } catch (error) {
+        return res.status(500).json({
+            message:'Fail',
+            error:error
+        });
+    }
+
+}
 exports.update_profile_experience = async (req,res,next)=>{
     
     try {
@@ -324,6 +356,111 @@ exports.update_profile_experience = async (req,res,next)=>{
                 userInfo:updateInfo
             });
         }
+    } catch (error) {
+        return res.status(500).json({
+            message:'Fail',
+            error:error
+        });
+    }
+}
+
+exports.delete_profile_experience = async (req,res,next)=>{
+    try {
+        const v = new Validator(req.body, {
+            experienceId: "required|string"
+        })
+
+        const matched = await v.check()
+        if(matched){
+            let profileInfo = await ProfileInformation.findOne({user: req.userInfo._id});
+            if(profileInfo){
+                let removeIndex = profileInfo.experience.map(element=>{element._id}).indexOf(req.body.experienceId)
+                profileInfo.experience.splice(removeIndex,1)
+                await profileInfo.save()
+            }
+            return res.status(200).json({
+                message:'Success',
+                profileInfo
+            });
+        }
+
+        return res.status(500).json({
+            message:'Invalid Input'
+        });
+    } catch (error) {
+        return res.status(500).json({
+            message:'Fail',
+            error:error
+        });
+    }
+
+}
+
+//file upload starts
+var storage = multer.diskStorage({
+    destination: function (req, file, callback) {
+      callback(null, './fileServer');
+    },
+    filename: function (req, file, callback) {
+      callback(null, Date.now() + '-' + file.originalname.toLowerCase().split(' ').join('-'));
+    }
+});
+
+var upload = multer({ storage : storage,
+    fileFilter: function (req, file, callback){
+        if(file.mimetype==='image/jpeg' || file.mimetype==='image/png'  || file.mimetype==='image/jpg'){
+            callback(null, true)
+        }else{
+            return callback(new Error('Only .png, .jpg and .jpeg format allowed!'), false);
+        }
+    },limits: function (req, file, callback) {
+        fileSize: 1024*1024*5 //limit of 5MB
+    }
+ }).single('ImageFile');
+
+
+ //update user information profile image
+exports.users_update_profileImage = async (req,res,next)=>{
+    try {
+        await upload(req,res, async function(err) {
+            if(err) {
+                return res.status(201).json({
+                    message:"fail",
+                    error:err
+                });
+            }
+            //update - add more to images
+            const updateRecord = await UserInformation.findOneAndUpdate({_id:req.userInfo._id},
+                {
+                    $set:{"profileImage": req.file.path}
+                },{new:true})
+                updateRecord.profileImage = 'http://localhost:3000/nodereact/'+ updateRecord.profileImage
+            return res.status(200).json({message:"success", profile:updateRecord});
+        });
+    } catch (error) {
+        return res.status(500).json({
+            message:'Fail',
+            error:error
+        });
+    }
+}
+
+
+
+//uplaod Cover Image
+exports.users_update_coverImage = async (req,res,next)=>{
+    try {
+        await upload(req,res, async function(err) {
+            if(err) {
+                return res.status(201).json({
+                    message:"fail",
+                    error:err
+                });
+            }
+            //update - add more to images
+            const updateRecord = await Users.findOneAndUpdate({_id:req.userData.userId},{$set:{"coverImage": req.file.path}},{new:true})
+            return res.status(200).json({message:"success", profile:updateRecord});
+        });
     } catch (error) {
         return res.status(500).json({
             message:'Fail',

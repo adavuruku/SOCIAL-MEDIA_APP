@@ -41,7 +41,7 @@ const profileInformation = mongoose.Schema({
     website:{type:String, trim:true,default:null},
     company:{type:String, trim:true,default:null},
     bio:{type:String, trim:true,default:null},
-    githubUsername:{type:String, trim:true,default:null},
+    githubUserName:{type:String, trim:true,default:null},
 
     followers:[
         {

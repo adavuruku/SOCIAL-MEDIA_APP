@@ -11,8 +11,15 @@ router.post('/login', userController.user_login);
 router.get('/me',account_active, userController.my_profile);
 router.patch('/update/profile', account_active, userController.update_profile);
 router.patch('/add/education', account_active, userController.update_profile_education);
-router.patch('/add/experience', account_active, userController.update_profile_experience);
+router.delete('/delete/education', account_active, userController.delete_profile_education);
 
+router.patch('/add/experience', account_active, userController.update_profile_experience);
+router.delete('/delete/experience', account_active, userController.delete_profile_experience);
+
+router.patch('/update/image', account_active, userController.users_update_profileImage);
+router.patch('/update/cover', account_active, userController.users_update_coverImage);
+
+ 
 // router.post('/update/profilepic', account_active, userController.user_update_profile_pics);
 // router.post('/update/coverimage', account_active, userController.user_update_profile_wallpaper);
 // router.post('/update/profile', account_active, userController.update_profile);
