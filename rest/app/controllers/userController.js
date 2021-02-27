@@ -287,8 +287,11 @@ exports.delete_profile_education = async (req,res,next)=>{
             let profileInfo = await ProfileInformation.findOne({user: req.userInfo._id});
             if(profileInfo){
                 let removeIndex = profileInfo.education.map(element=>{element._id}).indexOf(req.body.educationId)
-                profileInfo.education.splice(removeIndex,1)
-                await profileInfo.save()
+                if(removeIndex >= 0){
+                    profileInfo.education.splice(removeIndex,1)
+                    await profileInfo.save()
+                }
+                
             }
             return res.status(200).json({
                 message:'Success',
@@ -375,8 +378,11 @@ exports.delete_profile_experience = async (req,res,next)=>{
             let profileInfo = await ProfileInformation.findOne({user: req.userInfo._id});
             if(profileInfo){
                 let removeIndex = profileInfo.experience.map(element=>{element._id}).indexOf(req.body.experienceId)
-                profileInfo.experience.splice(removeIndex,1)
-                await profileInfo.save()
+                if(removeIndex >= 0){
+                    profileInfo.experience.splice(removeIndex,1)
+                    await profileInfo.save()
+                }
+                
             }
             return res.status(200).json({
                 message:'Success',

@@ -61,5 +61,6 @@ mongoose.connect(dbConfig.url, {
 // console.log(h)
 
 h = [2,4,5,6,7]
+h.shift(-1)
 g = h.map(j=>{j==2})
-console.log(g)
+console.log(h)
