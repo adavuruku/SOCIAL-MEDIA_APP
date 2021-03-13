@@ -1,6 +1,12 @@
 const express = require('express');
 const router = express.Router();
 
+// TraceView
+// Load Testing with Siege
+// Query Optimization
+// MySQL Server Configuration
+// De-normalization and Constraints
+// Nginx Configuration
 
 const {check_user_exist, account_active} = require ('../middlewares/checkUserExist');
 const postController = require('../controllers/postController');
