@@ -2,9 +2,21 @@ const express = require('express');
 const router = express.Router();
 
 
-const {check_user_exist, account_active} = require ('../middlewares/checkUserExist');
+const {check_user_exist, account_active, auth_header} = require ('../middlewares/checkUserExist');
 const userController = require('../controllers/userController');
+const UserInformation = require('../models/users');
 
+router.get('/auth', auth_header, async (req,res, next)=>{
+    console.log(req.userInfo)
+    try {
+        const user = await UserInformation.findOne({_id:req.userInfo._id}).select('-password -__v')
+        console.log(user)
+        res.json(user)
+    } catch (error) {
+        console.error(error.message)
+        res.status(500).send('Server Error')
+    }
+})
 //route to add new user
 router.post('/register', check_user_exist, userController.add_new_user);
 router.post('/login', userController.user_login);

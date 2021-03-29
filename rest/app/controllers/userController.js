@@ -32,12 +32,13 @@ const generateToken = (email,userId) =>{
 // })
 
 exports.add_new_user = async (req,res,next)=>{
+    // console.log('Newww Hereee')
     try {
-        console.log(req.body)
+        // console.log(req.body)
         const v = new Validator(req.body, {
             email: "required|email",
             password: "required|string|minLength:6",
-            fullName: "required|string|minLength:1"
+            name: "required|string|minLength:1"
         })
 
         const matched = await v.check()
@@ -48,16 +49,19 @@ exports.add_new_user = async (req,res,next)=>{
         }else{
             // email password fullName
             let hashVerificationCode = await bcrypt.hash(req.body.password.trim(),10)
-            const user = new UserInformation({
+            const userNew = new UserInformation({
                 _id : mongoose.Types.ObjectId(),
                 email :req.body.email.trim(),
                 password : hashVerificationCode,
-                fullName : req.body.fullName.trim()
+                name : req.body.name.trim()
             });
-            let newUser = await user.save()
+            let newUser = await userNew.save()
+            const tokenValue = generateToken(newUser.email,newUser._id)
+            // console.log(newUser)
             return res.status(200).json({
                 message:'Success',
-                newUser
+                user:newUser,
+                token:tokenValue
             });
         }
     } catch (error) {

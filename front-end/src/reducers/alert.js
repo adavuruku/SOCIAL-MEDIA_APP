@@ -1,5 +1,7 @@
 import { SET_ALERT, REMOVE_ALERT } from '../actions/types';
 
+// reducers define the content in the redux stores
+// more of a table in the db(store)
 const initialState = [];
 
 function alertReducer(state = initialState, action) {

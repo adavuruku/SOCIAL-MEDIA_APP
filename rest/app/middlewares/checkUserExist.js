@@ -42,3 +42,30 @@ module.exports.account_active = async (req, res, next)=>{
         });
     }
 }
+
+module.exports.auth_header = async (req, res, next)=>{
+    const token = req.header('x-auth-token')
+    if(!token){
+        console.log('No Token')
+        return res.status(401).json({msg:'No token, authorization denied'})
+    }
+    try{
+      
+        const decoded = jwt.verify(token,process.env.MY_HASH_SECRET);
+        // console.log(decoded)
+        let userExist = await UserInformation.findOne({email: decoded.emailAddress});
+        //make sure the account is not deactivated and is active
+        if(userExist){
+            req.userInfo = userExist
+            next();
+        }else{
+            res.status(422).json({
+                message:'Authentication Fail'
+            });
+        }
+    }catch(error){
+        res.status(422).json({
+            message:'Authentication Fail'
+        });
+    }
+}
