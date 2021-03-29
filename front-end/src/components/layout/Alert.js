@@ -7,7 +7,7 @@ const Alert = ({ alerts }) =>
     <div key={alert.id} className={`alert alert-${alert.alertType}`}>
       {alert.msg}
     </div>
-  ));
+));
 
 //this define all the props for
 // this component. 

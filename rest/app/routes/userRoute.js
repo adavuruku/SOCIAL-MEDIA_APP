@@ -7,7 +7,7 @@ const userController = require('../controllers/userController');
 const UserInformation = require('../models/users');
 
 router.get('/auth', auth_header, async (req,res, next)=>{
-    console.log(req.userInfo)
+    // console.log(req.userInfo)
     try {
         const user = await UserInformation.findOne({_id:req.userInfo._id}).select('-password -__v')
         console.log(user)
@@ -20,7 +20,7 @@ router.get('/auth', auth_header, async (req,res, next)=>{
 //route to add new user
 router.post('/register', check_user_exist, userController.add_new_user);
 router.post('/login', userController.user_login);
-router.get('/me',account_active, userController.my_profile);
+router.get('/me',auth_header, userController.my_profile);
 router.patch('/update/profile', account_active, userController.update_profile);
 router.patch('/add/education', account_active, userController.update_profile_education);
 router.delete('/delete/education', account_active, userController.delete_profile_education);

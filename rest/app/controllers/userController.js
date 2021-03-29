@@ -124,8 +124,7 @@ exports.my_profile = async (req,res,next)=>{
         let profileInfo = await ProfileInformation.findOne({user: req.userInfo._id});
         return res.status(200).json({
             message:'success',
-            userInfo:req.userInfo,
-            profileInfo:profileInfo
+            profile:profileInfo
         }); 
     } catch (error) {
         return res.status(500).json({

@@ -46,7 +46,7 @@ module.exports.account_active = async (req, res, next)=>{
 module.exports.auth_header = async (req, res, next)=>{
     const token = req.header('x-auth-token')
     if(!token){
-        console.log('No Token')
+        // console.log('No Token')
         return res.status(401).json({msg:'No token, authorization denied'})
     }
     try{

@@ -1,10 +1,11 @@
 import React, { Fragment, useState } from 'react';
 import { Link, Redirect } from 'react-router-dom';
 import { connect } from 'react-redux';
+import { setAlert } from '../../actions/alert';
 import PropTypes from 'prop-types';
 import { login } from '../../actions/auth';
 
-const Login = ({ login,isAuthenticated }) => {
+const Login = ({ setAlert, login,isAuthenticated }) => {
   const [formData, setFormData] = useState({
     email: '',
     password: ''
@@ -17,8 +18,12 @@ const Login = ({ login,isAuthenticated }) => {
 
   const onSubmit = e => {
     e.preventDefault();
-    console.log(email,password)
-    login({email, password});
+    if(email.length <=0 || password.length <=0){
+      setAlert('Invalid Email / Password','danger')
+    }else{
+      console.log(email,password)
+      login({email, password});
+    }
   };
   //redirrect of login
   if(isAuthenticated){
@@ -61,10 +66,11 @@ const Login = ({ login,isAuthenticated }) => {
 };
 Login.propTypes = {
   login:PropTypes.func.isRequired,
+  setAlert:PropTypes.func.isRequired,
   isAuthenticated: PropTypes.bool
 }
 let mapStateToProps = state =>({
   isAuthenticated: state.auth.isAuthenticated
 })
 // export default Login 
-export default connect(mapStateToProps, { login })(Login);
+export default connect(mapStateToProps, { setAlert, login })(Login);
