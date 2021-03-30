@@ -42,17 +42,6 @@ const profileInformation = mongoose.Schema({
     company:{type:String, trim:true,default:null},
     bio:{type:String, trim:true,default:null},
     githubUserName:{type:String, trim:true,default:null},
-
-    followers:[
-        {
-            type: mongoose.Schema.Types.ObjectId, ref: 'UsersInformations'
-        }
-    ],
-    friends:[
-        {
-            type: mongoose.Schema.Types.ObjectId, ref: 'UsersInformations'
-        }
-    ],
     active:{type:Boolean, default:false}, //account is not active till user verify email
     deleted:{type:Boolean, default:true} //account is deactivated till user verify email
 },{timestamps: true});

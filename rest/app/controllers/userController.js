@@ -87,7 +87,6 @@ exports.user_login = async (req,res,next)=>{
         }else{
             // email password fullName
             let userExist = await UserInformation.findOne({email: req.body.email.trim()});
-            console.log(userExist)
             if(userExist){
                 const hash = await bcrypt.compare(req.body.password,userExist.password)
                 if(hash && !userExist.deleted){
@@ -137,14 +136,15 @@ exports.my_profile = async (req,res,next)=>{
 exports.update_profile = async (req,res,next)=>{
     try {
         const v = new Validator(req.body, {
-            status: "string",
-            social: "object",
-            skills: "array",
+            status: "string|required",
+            company: "string|required",
+            social: "object|required",
+            skills: "array|required",
             location: "string|minLength:1",
-            website: "url",
-            company: "string|minLength:1",
-            bio: "string|minLength:1",
-            githubUserName: "string|minLength:1"
+            website: "url|required",
+            company: "string|minLength:1|required",
+            bio: "string|minLength:1|required",
+            githubUserName: "string|minLength:1|required"
         })
 
         const matched = await v.check()
@@ -153,64 +153,24 @@ exports.update_profile = async (req,res,next)=>{
                 message:'Invalid Data Input'
             });
         }else{
-            let status = social = skills =location =website =company = bio =githubUserName = null
-            let profileInfo = await ProfileInformation.findOne({user: req.userInfo._id});
-            if(profileInfo){
-                //update
-                status = !req.body.status ? profileInfo.status :req.body.status;
-                social = !req.body.social ? profileInfo.social :req.body.social;
-                skills = !req.body.skills ? profileInfo.skills :req.body.skills;
-                location = !req.body.location ? profileInfo.location :req.body.location;
-                website = !req.body.website ? profileInfo.website :req.body.website;
-                company = !req.body.company ? profileInfo.company :req.body.company;
-                bio = !req.body.bio ? profileInfo.bio :req.body.bio;
-                githubUserName = !req.body.githubUserName ? profileInfo.githubUserName : req.body.githubUserName;
-
-                updatedProfile = await ProfileInformation.findOneAndUpdate({user:profileInfo.user},
-                    {
-                        $set:{
-                            status:status,
-                            location:location,
-                            company:company,
-                            bio:bio,
-                            githubUserName:githubUserName,
-                            social:social,
-                            skills:skills,
-                            website:website,
-                        }
-                    },{new:true})
-                    return res.status(200).json({
-                        message:'Success',
-                        profile:updatedProfile
-                    });
-            }else{
-                //create
-                status = !req.body.status ? status :req.body.status;
-                social = !req.body.social ? social :req.body.social;
-                skills = !req.body.skills ? skills :req.body.skills;
-                location = !req.body.location ? location :req.body.location;
-                website = !req.body.website ? website :req.body.website;
-                company = !req.body.company ? company :req.body.company;
-                bio = !req.body.bio ? bio :req.body.bio;
-
-                const profile = new ProfileInformation({
-                    _id : mongoose.Types.ObjectId(),
-                    user:req.userInfo._id,
-                    status:status,
-                    location:location,
-                    company:company,
-                    bio:bio,
-                    githubUserName:githubUserName,
-                    social:social,
-                    skills:skills,
-                    website:website
-                });
-                let profileInfo = await profile.save()
+            updatedProfile = await ProfileInformation.findOneAndUpdate({user:req.userInfo._id},
+                {
+                    $set:{
+                        status:req.body.status,
+                        location:req.body.location,
+                        company:req.body.company,
+                        bio:req.body.bio,
+                        githubUserName:req.body.githubUserName,
+                        social:req.body.social,
+                        skills:req.body.skills,
+                        website:req.body.website
+                    }
+                },{new:true,upsert:true})
                 return res.status(200).json({
                     message:'Success',
-                    profileInfo
+                    profile:updatedProfile
                 });
-            }
+            
         }
     } catch (error) {
         return res.status(500).json({
