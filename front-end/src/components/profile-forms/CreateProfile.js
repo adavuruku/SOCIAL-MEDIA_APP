@@ -10,7 +10,7 @@ const initialState = {
   location: '',
   status: '',
   skills: '',
-  githubusername: '',
+  githubUserName: '',
   bio: '',
   twitter: '',
   facebook: '',
@@ -51,7 +51,7 @@ const CreateProfile = ({
     location,
     status,
     skills,
-    githubusername,
+    githubUserName,
     bio,
     twitter,
     facebook,
@@ -145,8 +145,8 @@ const CreateProfile = ({
           <input
             type="text"
             placeholder="Github Username"
-            name="githubusername"
-            value={githubusername}
+            name="githubUserName"
+            value={githubUserName}
             onChange={onChange}
           />
           <small className="form-text">
@@ -253,5 +253,5 @@ const mapStateToProps = state => ({
   profile: state.profile
 });
 
-//withRouter help to add jhistory object to implement redirect in action
+//withRouter help to add history object to implement redirect in action
 export default connect(mapStateToProps, { createProfile, getCurrentProfile })(withRouter(CreateProfile));

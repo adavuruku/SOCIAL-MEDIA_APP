@@ -6,6 +6,8 @@ const experiences = mongoose.Schema({
     title: {type: String, default:null},
     company:{type:String, default:null},
     location:{type: String, default:null},
+    description:{type: String, default:null},
+    current:{type:Boolean, default:false},
     from:{type:Date, default:null},
     to:{type:Date, default:null}
 });
@@ -43,8 +45,13 @@ const profileInformation = mongoose.Schema({
     bio:{type:String, trim:true,default:null},
     githubUserName:{type:String, trim:true,default:null},
     active:{type:Boolean, default:false}, //account is not active till user verify email
-    deleted:{type:Boolean, default:true} //account is deactivated till user verify email
+    deleted:{type:Boolean, default:false} //account is deactivated till user verify email
 },{timestamps: true});
 
+// profileInformation.virtual('userInfo', {
+//     ref: 'UsersInformations',
+//     localField: 'user',
+//     foreignField: '_id'
+// });
 const ProfileInformation = mongoose.model('ProfileInformations',profileInformation);
 module.exports = ProfileInformation;

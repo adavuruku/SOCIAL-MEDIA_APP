@@ -26,5 +26,10 @@ const userInformation = mongoose.Schema({
     coverImage:{type:String, trim:true,default:null}
 },{timestamps: true});
 
+// userInformation.virtual('profile', {
+//     ref: 'ProfileInformations',
+//     localField: '_id',
+//     foreignField: 'user'
+// });
 const UserInformation = mongoose.model('UsersInformations',userInformation);
 module.exports = UserInformation;

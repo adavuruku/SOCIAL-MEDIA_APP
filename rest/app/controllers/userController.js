@@ -146,7 +146,7 @@ exports.update_profile = async (req,res,next)=>{
             bio: "string|minLength:1|required",
             githubUserName: "string|minLength:1|required"
         })
-
+        // console.log(req.body)
         const matched = await v.check()
         if(!matched){
             return res.status(412).json({
@@ -209,27 +209,17 @@ exports.update_profile_education = async (req,res,next)=>{
                 current: req.body.current
             }
             let updateInfo = null;
-            let profileInfo = await ProfileInformation.findOne({user: req.userInfo._id});
-            if(profileInfo){
-                //update
-                updateInfo = await ProfileInformation.findOneAndUpdate({user:req.userInfo._id},
-                {
-                    $addToSet:{
-                        education:education
-                    }
-                },{new:true})
-            }else{
-                //create
-                const profile = new ProfileInformation({
-                    _id : mongoose.Types.ObjectId(),
-                    user:req.userInfo._id,
+            //update
+            updateInfo = await ProfileInformation.findOneAndUpdate({user:req.userInfo._id},
+            {
+                $addToSet:{
                     education:education
-                });
-                updateInfo = await profile.save()
-            }
+                }
+            },{new:true, upsert:true})
+            
             return res.status(200).json({
                 message:'Success',
-                userInfo:updateInfo
+                profile:updateInfo
             });
         }
     } catch (error) {
@@ -249,16 +239,17 @@ exports.delete_profile_education = async (req,res,next)=>{
         if(matched){
             let profileInfo = await ProfileInformation.findOne({user: req.userInfo._id});
             if(profileInfo){
-                let removeIndex = profileInfo.education.map(element=>{element._id}).indexOf(req.body.educationId)
+                let removeIndex = profileInfo.education.map(element=>element._id).indexOf(req.body.educationId)
                 if(removeIndex >= 0){
                     profileInfo.education.splice(removeIndex,1)
                     await profileInfo.save()
                 }
+                // console.log(req.body.educationId, filtered,removeIndex, profileInfo.education)
                 
             }
             return res.status(200).json({
                 message:'Success',
-                profileInfo
+                profile:profileInfo
             });
         }
 
@@ -280,10 +271,13 @@ exports.update_profile_experience = async (req,res,next)=>{
             title: "required|string|minLength:3",
             company: "required|string|minLength:3",
             location: "required|string|minLength:3",
+            description: "required|string|minLength:3",
+            current: "required|boolean",
             from: "required|date",
             to: "required|date",
         })
 
+        console.log('here')
         const matched = await v.check()
         if(!matched){
             return res.status(412).json({
@@ -296,30 +290,20 @@ exports.update_profile_experience = async (req,res,next)=>{
                 company: req.body.company.trim(),
                 location: req.body.location.trim(),
                 from: req.body.from.trim(),
+                description: req.body.description.trim(),
+                current: req.body.current,
                 to: req.body.to.trim()
             }
             let updateInfo = null;
-            let profileInfo = await ProfileInformation.findOne({user: req.userInfo._id});
-            if(profileInfo){
-                //update
-                updateInfo = await ProfileInformation.findOneAndUpdate({user:req.userInfo._id},
-                {
-                    $addToSet:{
-                        experience:experience
-                    }
-                },{new:true})
-            }else{
-                //create
-                const profile = new ProfileInformation({
-                    _id : mongoose.Types.ObjectId(),
-                    user:req.userInfo._id,
+            updateInfo = await ProfileInformation.findOneAndUpdate({user:req.userInfo._id},
+            {
+                $addToSet:{
                     experience:experience
-                });
-                updateInfo = await profile.save()
-            }
+                }
+            },{new:true, upsert:true})
             return res.status(200).json({
                 message:'Success',
-                userInfo:updateInfo
+                profile:updateInfo
             });
         }
     } catch (error) {
@@ -340,7 +324,7 @@ exports.delete_profile_experience = async (req,res,next)=>{
         if(matched){
             let profileInfo = await ProfileInformation.findOne({user: req.userInfo._id});
             if(profileInfo){
-                let removeIndex = profileInfo.experience.map(element=>{element._id}).indexOf(req.body.experienceId)
+                let removeIndex = profileInfo.experience.map(element=>element._id).indexOf(req.body.experienceId)
                 if(removeIndex >= 0){
                     profileInfo.experience.splice(removeIndex,1)
                     await profileInfo.save()
@@ -349,7 +333,7 @@ exports.delete_profile_experience = async (req,res,next)=>{
             }
             return res.status(200).json({
                 message:'Success',
-                profileInfo
+                profile:profileInfo
             });
         }
 
@@ -430,6 +414,22 @@ exports.users_update_coverImage = async (req,res,next)=>{
             const updateRecord = await UserInformation.findOneAndUpdate({_id:req.userInfo._id},{$set:{"coverImage": req.file.path}},{new:true})
             updateRecord.coverImage = process.env.SERVER_URL + updateRecord.coverImage
             return res.status(200).json({message:"success", profile:updateRecord});
+        });
+    } catch (error) {
+        return res.status(500).json({
+            message:'Fail',
+            error:error
+        });
+    }
+}
+
+exports.fetch_all_profile = async (req,res,next)=>{
+    try {
+        let post = await ProfileInformation.find().sort({updatedAt:-1}).populate({ path: 'user', select: '_d name profileImage' })
+        // console.log(post)
+        return res.status(200).json({
+            message:'Success',
+            profiles:post
         });
     } catch (error) {
         return res.status(500).json({

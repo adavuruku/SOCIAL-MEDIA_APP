@@ -21,14 +21,15 @@ const Login = ({ setAlert, login,isAuthenticated }) => {
     if(email.length <=0 || password.length <=0){
       setAlert('Invalid Email / Password','danger')
     }else{
-      console.log(email,password)
       login({email, password});
     }
   };
   //redirrect of login
+  console.log(isAuthenticated)
   if(isAuthenticated){
     return <Redirect to="/dashboard"/>
   }
+ 
   return (
     <Fragment>
       <h1 className="large text-primary">Sign In</h1>

@@ -22,16 +22,18 @@ router.post('/register', check_user_exist, userController.add_new_user);
 router.post('/login', userController.user_login);
 router.get('/me',auth_header, userController.my_profile);
 router.patch('/update/profile', auth_header, userController.update_profile);
-router.patch('/add/education', account_active, userController.update_profile_education);
-router.delete('/delete/education', account_active, userController.delete_profile_education);
+router.patch('/add/education', auth_header, userController.update_profile_education);
+router.patch('/delete/education', auth_header, userController.delete_profile_education);
 
-router.patch('/add/experience', account_active, userController.update_profile_experience);
-router.delete('/delete/experience', account_active, userController.delete_profile_experience);
+router.patch('/add/experience', auth_header, userController.update_profile_experience);
+router.patch('/delete/experience', auth_header, userController.delete_profile_experience);
 
 router.patch('/update/image', account_active, userController.users_update_profileImage);
 router.patch('/update/cover', account_active, userController.users_update_coverImage);
 
- 
+router.get('/profiles', userController.fetch_all_profile);
+// 
+
 // router.post('/update/profilepic', account_active, userController.user_update_profile_pics);
 // router.post('/update/coverimage', account_active, userController.user_update_profile_wallpaper);
 // router.post('/update/profile', account_active, userController.update_profile);
