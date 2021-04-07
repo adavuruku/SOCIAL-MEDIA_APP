@@ -32,6 +32,7 @@ router.patch('/update/image', account_active, userController.users_update_profil
 router.patch('/update/cover', account_active, userController.users_update_coverImage);
 
 router.get('/profiles', userController.fetch_all_profile);
+router.post('/testimage', userController.users_test);
 // 
 
 // router.post('/update/profilepic', account_active, userController.user_update_profile_pics);

@@ -21,6 +21,7 @@ const statisticRoutes = require('./app/routes/statisticRoute');
 const postRoutes = require('./app/routes/postRoute');
 
 app.use('/fileServer', express.static('./fileServer'));
+
 app.use('/api/user',usersRoutes);
 app.use('/api/post',postRoutes);
 

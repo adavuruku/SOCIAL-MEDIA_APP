@@ -438,3 +438,25 @@ exports.fetch_all_profile = async (req,res,next)=>{
         });
     }
 }
+
+//uplaod Cover Image
+exports.users_test = async (req,res,next)=>{
+    try {
+        await upload(req,res, async function(err) {
+            if(err) {
+                return res.status(201).json({
+                    message:"fail",
+                    error:err
+                });
+            }
+           
+            let url = process.env.SERVER_URL + req.file.path
+            return res.status(200).json({message:"success", url});
+        });
+    } catch (error) {
+        return res.status(500).json({
+            message:'Fail',
+            error:error
+        });
+    }
+}
